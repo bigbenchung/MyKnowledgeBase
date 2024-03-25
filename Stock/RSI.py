@@ -1,5 +1,6 @@
 import yfinance as yf
 from typing import Callable
+from sys import argv
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -33,7 +34,7 @@ def calculateRSI(over: pd.Series, fn_roll: Callable = lambda s: s.ewm(span=14).m
     return rsi
 
 if __name__ == "__main__":
-    msft = yf.Ticker("TTD")
+    msft = yf.Ticker(argv[1].upper())
     # get historical market data
     hist = msft.history(period="1mo")
     close = hist["Close"]

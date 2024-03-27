@@ -3,9 +3,6 @@ from Timer import Timer
 class Solution:
 
     totalTimer = Timer()
-    filterTimer = Timer()
-    sizeTimer = Timer()
-    appendTimer = Timer()
     
     def numSubarrayProductLessThanK(self, nums: list[int], k: int) -> int:
         

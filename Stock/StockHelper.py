@@ -4,19 +4,23 @@ from sys import argv
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime
 
 from Intersection import Intersection
 
 class StockHelper:
     
-    def __init__(self, data: pd.DataFrame):
-        self.data = data[data.columns.drop(["Dividends", "Stock Splits"])]
+    def __init__(self, stock_code: str, period: str):
+        stock = yf.Ticker(stock_code.upper())
+        # get historical market data
+        self.data = stock.history(period=period)
+        
+        self.data = self.data[self.data.columns.drop(["Dividends", "Stock Splits"])]
         self.data = self.data.set_index(self.data.index.date)
+        
         self.DaysAvg = dict()
         for n in (3, 5, 7, 10, 20):
             self.DaysAvg[n] = self.getNDaysAverage(n)
-        
-        self.plotDaysAverage([3, 5, 7, 10, 20], self.getLineIntersections(20, [3,5,7]))
         
     def plotDaysAverage(self, days_chosen: list[int], intersections:list[Intersection]=None):
         
@@ -48,27 +52,27 @@ class StockHelper:
                 output_series.at[dt_index] = temp_sum / n
             index += 1
         
-        return output_series
+        return output_series[::-1]
     
     def getLineIntersections(self, target_n: int, remaining_n: list[int], limit=60) -> list[Intersection]:
         
         target_line = self.DaysAvg[target_n]
         other_lines = [self.DaysAvg[n] for n in remaining_n]
+        
+        limit = min(limit, target_line.size, min([line.size for line in other_lines]))
+        
+        target_line = target_line[len(target_line)-limit:]
+        target_prev = target_line[0]
+        
         other_prev = list()
-        other_sizes = list()
-        target_prev = target_line[-1]
         
         for line in other_lines:
-            other_prev.append(line[-1])
-            other_sizes.append(line.size)
-            
-        limit = min(limit, target_line.size, min(other_sizes))
-        
-        del other_sizes
+            line = line[len(line)-limit:]
+            other_prev.append(line[0])
         
         intersections = list()
         
-        for day_index in range(limit-2, -1, -1):
+        for day_index in range(0, limit):
             target_tdy = target_line[day_index]
             for i, line in enumerate(other_lines):
                 tdy_target_larger = target_tdy >= line[day_index]
@@ -85,6 +89,15 @@ class StockHelper:
             target_prev = target_tdy
         
         return intersections
+    
+    def getPriceByDate(self, day: datetime, type="Close") -> float:
+        return self.data.loc[pd.to_datetime(day).date()][type]
+    
+    def getPriceByIndex(self, index=-1, type="Close"):
+        """
+        Default value is -1, meaning the latest price
+        """
+        return self.data.iloc[index][type]
         
 if __name__ == "__main__":
     try:
@@ -92,10 +105,5 @@ if __name__ == "__main__":
     except IndexError:
         code = "TSLA"
     
-    code = code.upper()
-    
-    stock = yf.Ticker(code)
-    # get historical market data
-    hist = stock.history(period="12mo")
-    
-    stock = print(StockHelper(hist))
+    stock = StockHelper(code, period="12mo")
+    stock.plotDaysAverage([3, 5, 7, 10, 20], stock.getLineIntersections(20, [3,5,7]))

@@ -1,3 +1,5 @@
+import pandas as pd
+
 from StockHelper import StockHelper
 
 class TradingStrategy:
@@ -24,7 +26,7 @@ class TradingStrategy:
         self.bought_price = trade_price
         self.cash -= self.lot * self.bought_price
                         
-    def trade(self):
+    def trade(self, export=False):
         pass
     
     def getPnL(self) -> float:
@@ -34,10 +36,12 @@ class TradingStrategy:
         return self.cash + self.lot*self.stock.getPriceByIndex()
     
     def printDetails(self) -> None:
-        print(f"Cash: {self.cash}")
-        print(f"Current Lot: {self.lot}")
-        print(f"Bought Price: {self.bought_price}")
-        print(f"Stock: {self.lot*self.stock.getPriceByIndex()}")
-        print(f"Total Asset: {self.getTotalAsset()}")
-        print(f"P/L: {self.getPnL()*100}%")
+        print(f"-------------- Result --------------")
+        print(f"Stock Code:\t{self.stock.stock_code}")
+        print(f"Cash:\t{self.cash}")
+        print(f"Current Lot:\t{self.lot}")
+        print(f"Bought Price:\t{self.bought_price}")
+        print(f"Stock:\t{self.lot*self.stock.getPriceByIndex()}")
+        print(f"Total Asset:\t{self.getTotalAsset()}")
+        print(f"P/L:\t{self.getPnL()*100}%")
     

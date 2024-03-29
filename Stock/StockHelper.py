@@ -11,7 +11,11 @@ from Intersection import Intersection
 class StockHelper:
     
     def __init__(self, stock_code: str, period: str):
+        self.stock_code = stock_code
+        self.period = period
+        
         stock = yf.Ticker(stock_code.upper())
+
         # get historical market data
         self.data = stock.history(period=period)
         
@@ -102,7 +106,41 @@ class StockHelper:
         Default value is -1, meaning the latest price
         """
         return self.data.iloc[index][type]
+    
+    def getLastTradeDate(self, base_day: datetime) -> datetime:
+        datetime_indexer = pd.to_datetime(base_day).date()
+        if datetime_indexer == self.data.index[0]:
+            print("Cannot find last trade date first row")
+            return None
+
+        try:
+            base_day_row = self.data.index.get_loc(datetime_indexer)
+        except KeyError:
+            print("Date not found in index")
+            return None
         
+        return self.data.index[base_day_row-1]
+    
+    def getReturn(self, base_day: datetime, lag_days=1) -> float:
+        datetime_indexer = pd.to_datetime(base_day).date()
+        
+        if datetime_indexer == self.data.index[0]:
+            print("Cannot generate return for first row")
+            return None
+        
+        try:
+            base_day_row = self.data.index.get_loc(datetime_indexer)
+        except KeyError:
+            print("Date not found in index")
+            return None
+        
+        if base_day_row - lag_days < 0:
+            print("The dataset does not contain enough data to calculate this lag return")
+            return None
+        
+        lagged_price = self.data.iloc[base_day_row - lag_days]
+        return (self.data.iloc[base_day_row]["Close"] - lagged_price["Close"]) / lagged_price["Close"]
+    
 if __name__ == "__main__":
     try:
         code = argv[1]
@@ -115,4 +153,5 @@ if __name__ == "__main__":
         period = "12mo"
         
     stock = StockHelper(code, period=period)
+    print(stock.getReturn(datetime(2024,3,28)))
     stock.plotDaysAverage([3, 5, 7, 10, 20], stock.getLineIntersections(20, [3,5,7]))

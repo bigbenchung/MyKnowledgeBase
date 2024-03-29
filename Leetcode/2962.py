@@ -20,7 +20,6 @@ class Solution:
                 if next_index_tracker < 0:
                     if max_ele_counter == k:
                         next_index_tracker = 0
-                        del max_ele_counter
                     else:
                         max_ele_counter += 1
                         
@@ -34,7 +33,7 @@ class Solution:
             else:
                 temp_count += 1
         
-        if len(max_ele_border_tracker) >= k:
+        if max_ele_counter == k:
             counter += (temp_sum + max_ele_border_tracker[max(next_index_tracker, 0)] + 1) * (temp_count + 1)
 
         return counter

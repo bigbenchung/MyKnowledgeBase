@@ -12,6 +12,18 @@ class TradingStrategy:
         self.bought_price = 0.0
         self.lot = 0
     
+    def sell(self, trade_price: float):
+        self.cash += trade_price * self.lot
+        self.bought = False
+        self.bought_price = 0.0
+        self.lot = 0
+        
+    def buy(self, trade_price: float):
+        self.bought = True
+        self.lot = self.cash // trade_price
+        self.bought_price = trade_price
+        self.cash -= self.lot * self.bought_price
+                        
     def trade(self):
         pass
     

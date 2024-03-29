@@ -20,16 +20,10 @@ class RSITrading(TradingStrategy):
                 trade_price = (open[i] + close_price)/2
                 if self.bought:
                     if rsi > 70 and self.bought_price < trade_price:
-                        self.cash += trade_price * self.lot
-                        self.bought = False
-                        self.bought_price = 0.0
-                        self.lot = 0
+                        self.sell(trade_price)
                 else:
                     if rsi < 30:
-                        self.bought = True
-                        self.lot = self.cash // trade_price
-                        self.bought_price = trade_price
-                        self.cash -= self.lot * self.bought_price
+                        self.buy(trade_price)
 
 if __name__ == "__main__":
     try:

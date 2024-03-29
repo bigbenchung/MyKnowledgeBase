@@ -54,11 +54,12 @@ class GoldenCrossTrading(TradingStrategy):
                         check = self.resetCheck()
                     elif not up_trend and self.bought:
                         self.sell(trade_price)
-                        if new_row:
-                            new_row[-1] = (trade_price - new_row[-1]) / new_row[-1]
-                            export_df.loc[index_tracker] = new_row
-                            index_tracker += 1
-                            del new_row
+                        if export:
+                            if new_row:
+                                new_row[-1] = (trade_price - new_row[-1]) / new_row[-1]
+                                export_df.loc[index_tracker] = new_row
+                                index_tracker += 1
+                                del new_row
                         check = self.resetCheck()
             else:
                 up_trend = not up_trend

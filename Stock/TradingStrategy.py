@@ -37,11 +37,11 @@ class TradingStrategy:
     
     def printDetails(self) -> None:
         print(f"-------------- Result --------------")
-        print(f"Stock Code:\t{self.stock.stock_code}")
-        print(f"Cash:\t{self.cash}")
-        print(f"Current Lot:\t{self.lot}")
-        print(f"Bought Price:\t{self.bought_price}")
-        print(f"Stock:\t{self.lot*self.stock.getPriceByIndex()}")
-        print(f"Total Asset:\t{self.getTotalAsset()}")
-        print(f"P/L:\t{self.getPnL()*100}%")
+        print(f"{'Stock Code:'.ljust(20,' ')}{self.stock.stock_code}")
+        print(f"{'Cash:'.ljust(20,' ')}{self.cash}")
+        print(f"{'Current Lot:'.ljust(20,' ')}{self.lot}")
+        print(f"{'Bought Price:'.ljust(20, ' ')}{self.bought_price}")
+        print(f"{'Stock:'.ljust(20, ' ')}{self.lot*self.stock.getPriceByIndex()}")
+        print(f"{'Total Asset:'.ljust(20, ' ')}{self.getTotalAsset()}")
+        print(f"{'P/L:'.ljust(20, ' ')}{self.getPnL()*100}%")
     

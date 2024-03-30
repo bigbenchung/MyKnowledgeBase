@@ -30,15 +30,20 @@ class StockHelper:
         
     def plotDaysAverage(self, days_chosen: list[int], intersections:list[Intersection]=None):
         
+        fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
+
         for n in days_chosen:
-            plt.plot(self.DaysAvg[n], label=f"{n} Days")
-        
+            ax1.plot(self.DaysAvg[n], label=f"{n} Days")
+
         if intersections != None:
             for intersection in intersections:
                 color = "r" if intersection.up_trend else "b"
-                plt.axvline(x=intersection.day, color=color, linestyle='--')
-                
-        plt.legend()
+                ax1.axvline(x=intersection.day, color=color, linestyle='--')
+        ax1.legend()
+        
+        ax2.plot(self.data["Close"].iloc[-self.dayLimit:])
+
+        plt.title(self.stock_code)
         plt.show()
         
     def getNDaysAverage(self, n: int, limit: int) -> pd.Series:

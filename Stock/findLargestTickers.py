@@ -8,7 +8,7 @@ def findLargestTickers(market_cap=2000000000, avg_volume=500000, data_year=5):
             (df["Volume"] >= avg_volume) &
             (df["IPO Year"] < datetime.now().year - data_year)]
     
-    df.to_csv("largestTickers.csv", header=True, index=False)
+    df.to_csv("./data/largestTickers.csv", header=True, index=False)
 
 if __name__ == "__main__":
     findLargestTickers()

@@ -66,7 +66,7 @@ class GoldenCrossTrading(TradingStrategy):
                 check = self.resetCheck()
 
         if export:
-            export_df.to_csv(f"./results/{self.stock.stock_code}_{self.stock.period}.csv", index=False, header=True)
+            return export_df
             
 if __name__ == "__main__":
     try:

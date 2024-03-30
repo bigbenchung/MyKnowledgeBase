@@ -1,15 +1,14 @@
 from sys import argv
+import pandas as pd
 
 from GoldenCrossTrading import GoldenCrossTrading
 from StockHelper import StockHelper
 
 def test(principal: float, export: bool, period: str):
     tickers = list()
-    with open("largestTickers.csv", "r") as f:
-        lines = f.readlines()
-        for line in lines:
-            tickers.append(line.strip())
-        
+    all_large_tickers = pd.read_csv("./data/largestTickers.csv")
+
+    dfs = list()
     for ticker in tickers:
         trading = GoldenCrossTrading(
             stock=StockHelper(stock_code=ticker, period=period), 
@@ -17,8 +16,11 @@ def test(principal: float, export: bool, period: str):
             target_n=20,
             remaining_n=[3,5,7]
         )
-        trading.trade(export=export)
+        dfs.append(trading.trade(export=export))
         trading.printDetails()
+    
+    output_df = pd.concat(dfs, axis=0)
+    output_df.to_csv(f"./results/test_result_{period}.csv", index=False, header=True)
     
 if __name__ == "__main__":
     principal=float(argv[1])

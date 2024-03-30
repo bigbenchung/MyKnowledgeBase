@@ -54,7 +54,7 @@ class StockHelper:
             if index == 0:
                 output_series.at[dt_index] = temp_sum / n
             else:
-                temp_sum += closing_price[index+n-1] - closing_price[index-1]
+                temp_sum += closing_price.iloc[index+n-1] - closing_price.iloc[index-1]
                 output_series.at[dt_index] = temp_sum / n
             index += 1
         
@@ -70,20 +70,20 @@ class StockHelper:
         prev_days = min(prev_days, target_line.size, min([line.size for line in other_lines]))
         
         target_line = target_line[-prev_days:]
-        target_prev = target_line[0]
+        target_prev = target_line.iloc[0]
         
         other_prev = list()
         
         for i, line in enumerate(other_lines):
             other_lines[i] = line[-prev_days:]
-            other_prev.append(line[0])
+            other_prev.append(line.iloc[0])
             
         intersections = list()
         
         for day_index in range(0, prev_days):
-            target_tdy = target_line[day_index]
+            target_tdy = target_line.iloc[day_index]
             for i, line in enumerate(other_lines):
-                tdy_target_larger = target_tdy >= line[day_index]
+                tdy_target_larger = target_tdy >= line.iloc[day_index]
                 prev_target_larger = target_prev >= other_prev[i]
                 
                 if not (tdy_target_larger == prev_target_larger):
@@ -93,7 +93,7 @@ class StockHelper:
                                 day=line.index[day_index],
                                 up_trend=up_trend,
                                 targetPercentChange=(target_tdy-target_prev)/target_prev))
-                other_prev[i] = line[day_index]
+                other_prev[i] = line.iloc[day_index]
             target_prev = target_tdy
         
         return intersections
@@ -153,5 +153,5 @@ if __name__ == "__main__":
         period = "12mo"
         
     stock = StockHelper(code, period=period)
-    print(stock.getReturn(datetime(2024,3,28)))
+    
     stock.plotDaysAverage([3, 5, 7, 10, 20], stock.getLineIntersections(20, [3,5,7]))

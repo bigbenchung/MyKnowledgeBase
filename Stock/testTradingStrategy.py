@@ -5,11 +5,11 @@ from GoldenCrossTrading import GoldenCrossTrading
 from StockHelper import StockHelper
 
 def test(principal: float, export: bool, period: str):
-    tickers = list()
     all_large_tickers = pd.read_csv("./data/largestTickers.csv")
 
     dfs = list()
-    for ticker in tickers:
+    for i, row in all_large_tickers.iterrows():
+        ticker = row["Symbol"]
         trading = GoldenCrossTrading(
             stock=StockHelper(stock_code=ticker, period=period), 
             principal=principal,

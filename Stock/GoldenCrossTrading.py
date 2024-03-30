@@ -1,7 +1,9 @@
 from sys import argv
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
+import pickle
 
 from StockHelper import StockHelper
 from TradingStrategy import TradingStrategy
@@ -20,18 +22,14 @@ class GoldenCrossTrading(TradingStrategy):
     
     def resetCheck(self) -> dict:
         return self.default
-        
-    def trade(self, export=False):
-        
-        if export:
-            export_df = pd.DataFrame(columns=["buy_lag1_return", "buy_lag2_return", "buy_lag3_return", "buy_lag4_return", "buy_20day_slope","gain/loss"])
-            index_tracker = 0
-            
-        self.intersections: list[Intersection] = self.stock.getLineIntersections(target_n=20, remaining_n=[3,5,7])
+    
+    def getBuySellSignals(self, intersections: list[Intersection]) -> list[dict]:
+        # containing dict with keys date, buy/sell, trade_price, intersection
+        signals = list()
         check = self.resetCheck()
         up_trend = None
-        
-        for intersection in self.intersections:
+
+        for i, intersection in enumerate(intersections):
             if up_trend == None:
                 up_trend = intersection.up_trend
             
@@ -40,30 +38,51 @@ class GoldenCrossTrading(TradingStrategy):
                 if set(check.values()) == {True}:
                     trade_price = self.stock.getPriceByDate(intersection.day, "Open")
                     if up_trend and not self.bought:
-                        self.buy(trade_price)
-                        if export:
-                            ref_day = self.stock.getLastTradeDate(intersection.day)
-                            new_row = list()
-                            
-                            for i in range(0, 4):
-                                new_row += [self.stock.getReturn(ref_day, 1)]
-                                ref_day = self.stock.getLastTradeDate(ref_day)
-                            
-                            new_row += [intersection.targetPercentChange, trade_price]
-                            
+                        signals.append({"date": intersection.day, 
+                                        "buy/sell": "buy", 
+                                        "trade_price": trade_price,
+                                        "intersection": intersection})
                         check = self.resetCheck()
                     elif not up_trend and self.bought:
-                        self.sell(trade_price)
-                        if export:
-                            if new_row:
-                                new_row[-1] = (trade_price - new_row[-1]) / new_row[-1]
-                                export_df.loc[index_tracker] = new_row
-                                index_tracker += 1
-                                del new_row
+                        signals.append({"date": intersection.day, 
+                                        "buy/sell": "sell", 
+                                        "trade_price": trade_price,
+                                        "intersection": intersection})
                         check = self.resetCheck()
             else:
                 up_trend = not up_trend
                 check = self.resetCheck()
+        return signals
+
+    def trade(self, export=False):
+
+        if export:
+            export_df = pd.DataFrame(columns=["buy_lag1_return", "buy_20day_slope", "gain/loss"])
+            index_tracker = 0
+            
+        intersections: list[Intersection] = self.stock.getLineIntersections(target_n=20, remaining_n=[3,5,7])
+        
+        signals = self.getBuySellSignals(intersections)
+        
+        for signal in signals:
+            # check for buy signal
+            if not self.bought:
+                if signal["buy/sell"] == "buy":
+                    self.buy(signal["trade_price"])
+                    if export:
+                        intersection: Intersection = signal["intersection"]
+                        ref_day = self.stock.getLastTradeDate(intersection.day)
+                        new_row = [self.stock.getReturn(ref_day, 1), intersection.targetPercentChange, trade_price]
+            # check for sell signal
+            else:
+                if signal["buy/sell"] == "sell":
+                    self.sell(signal["trade_price"])
+                    if export:
+                        if new_row:
+                            new_row[-1] = (trade_price - new_row[-1]) / abs(new_row[-1])
+                            export_df.loc[index_tracker] = new_row
+                            index_tracker += 1
+                            del new_row
 
         if export:
             return export_df

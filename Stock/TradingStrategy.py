@@ -35,6 +35,14 @@ class TradingStrategy:
     def getTotalAsset(self) -> float:
         return self.cash + self.lot*self.stock.getPriceByIndex()
     
+    def getStockPnL(self) -> float:
+        day1_price = self.stock.getPriceByIndex(0)
+        return (self.stock.getPriceByIndex()-day1_price)/abs(day1_price)
+
+    def getEffectiveIncrease(self) -> float:
+        stock_return = self.getStockPnL()
+        return (self.getPnL() - stock_return)/abs(stock_return)
+    
     def printDetails(self) -> None:
         print(f"-------------- Result --------------")
         print(f"{'Stock Code:'.ljust(20,' ')}{self.stock.stock_code}")
@@ -44,4 +52,5 @@ class TradingStrategy:
         print(f"{'Stock:'.ljust(20, ' ')}{self.lot*self.stock.getPriceByIndex()}")
         print(f"{'Total Asset:'.ljust(20, ' ')}{self.getTotalAsset()}")
         print(f"{'P/L:'.ljust(20, ' ')}{self.getPnL()*100}%")
-    
+        print(f"{'Stock P/L:'.ljust(20, ' ')}{self.getStockPnL()*100}%")
+        print(f"{'%Increase by Strat:'.ljust(20, ' ')}{self.getEffectiveIncrease()*100}%")

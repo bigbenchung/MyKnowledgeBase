@@ -92,7 +92,7 @@ class StockHelper:
                                 n_avg=remaining_n[i],
                                 day=line.index[day_index],
                                 up_trend=up_trend,
-                                targetPercentChange=(target_tdy-target_prev)/target_prev))
+                                targetPercentChange=(target_tdy-target_prev)/abs(target_prev)))
                 other_prev[i] = line.iloc[day_index]
             target_prev = target_tdy
         
@@ -139,7 +139,7 @@ class StockHelper:
             return None
         
         lagged_price = self.data.iloc[base_day_row - lag_days]
-        return (self.data.iloc[base_day_row]["Close"] - lagged_price["Close"]) / lagged_price["Close"]
+        return (self.data.iloc[base_day_row]["Close"] - lagged_price["Close"]) / abs(lagged_price["Close"])
     
 if __name__ == "__main__":
     try:

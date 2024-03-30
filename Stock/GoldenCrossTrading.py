@@ -72,14 +72,14 @@ class GoldenCrossTrading(TradingStrategy):
                     if export:
                         intersection: Intersection = signal["intersection"]
                         ref_day = self.stock.getLastTradeDate(intersection.day)
-                        new_row = [self.stock.getReturn(ref_day, 1), intersection.targetPercentChange, trade_price]
+                        new_row = [self.stock.getReturn(ref_day, 1), intersection.targetPercentChange, signal["trade_price"]]
             # check for sell signal
             else:
                 if signal["buy/sell"] == "sell":
                     self.sell(signal["trade_price"])
                     if export:
                         if new_row:
-                            new_row[-1] = (trade_price - new_row[-1]) / abs(new_row[-1])
+                            new_row[-1] = (signal["trade_price"] - new_row[-1]) / abs(new_row[-1])
                             export_df.loc[index_tracker] = new_row
                             index_tracker += 1
                             del new_row

@@ -5,31 +5,22 @@ class Solution:
     totalTimer = Timer()
 
     def countSubarrays(self, nums: list[int], minK: int, maxK: int) -> int:
+        if minK == maxK and len(set(nums)) == 1:
+            return 0 if nums[0] != minK else sum([len(nums) - partition_size + 1 for partition_size in range(1, len(nums) + 1)])
         
+        k = 1 if minK == maxK else 2
         partitions = list()
         minK_check = False
         maxK_check = False
         good_first_index = -1
         good_rng = range(minK, maxK+1)
+
         for i, num in enumerate(nums):
             if good_first_index == -1:
                 if num in good_rng:
-                    good_first_index = i
-                    minK_check = num == minK
-                    maxK_check = num == maxK
+                    left = i
             else:
-                minK_check = max(minK_check, num == minK)
-                maxK_check = max(maxK_check, num == maxK)
-
-                if num not in good_rng:
-                    if minK_check and maxK_check:
-                        partitions.append((good_first_index, i))
-                    minK_check = False
-                    maxK_check = False
-                    good_first_index = -1
-                elif i == len(nums) - 1:
-                    if minK_check and maxK_check:
-                        partitions.append((good_first_index, len(nums)))
+                
 
         del minK_check, maxK_check, good_first_index, good_rng
 
@@ -37,26 +28,29 @@ class Solution:
 
         for start, end in partitions:
             partition = nums[start:end]
-            print(partition)
             right = -1
             min_max_counter = {"min": 0, "max": 0}
             for left in range(len(partition)):
                 if left > 0:
                     min_max_counter["min"] -= 1 if partition[left-1] == minK else 0
                     min_max_counter["max"] -= 1 if partition[left-1] == maxK else 0
+
                     if min_max_counter["min"] > 0 and min_max_counter["max"] > 0:
                         counter += 1
 
                         if not decreasing:
                             while right >= left + 1:
-                                if partition[right] == minK and min_max_counter["min"] == 1:
-                                    break
-                                else:
-                                    min_max_counter["min"] -= 1    
-                                if partition[right] == maxK and min_max_counter["max"] == 1:
-                                    break
-                                else:
-                                    min_max_counter["max"] -= 1
+                                if partition[right] == minK:
+                                    if min_max_counter["min"] == 1:
+                                        break
+                                    
+                                    else:
+                                        min_max_counter["min"] -= 1    
+                                if partition[right] == maxK:
+                                    if min_max_counter["max"] == 1:
+                                        break
+                                    else:
+                                        min_max_counter["max"] -= 1
                                 right -= 1
                                 counter += 1
 
@@ -79,9 +73,9 @@ class Solution:
 if __name__ == "__main__":
     s = Solution()
     
-    nums = [35054,398719,945315,945315,820417,945315,35054,945315,171832,945315,35054,109750,790964,441974,552913]
-    minK = 35054
-    maxK = 945315
+    nums = [1,1,1,1]
+    minK = 1
+    maxK = 1
     
     print(s.countSubarrays(nums, minK, maxK)) 
     print(s.totalTimer.getTotalTime())

@@ -24,10 +24,12 @@ class StockHelper:
         
         self.DaysAvg = dict()
         self.dayLimit = len(self.data)-20
-        
+        import time
+        start_time = time.time()
         for n in (3, 5, 7, 10, 20):
             self.DaysAvg[n] = self.getNDaysAverage(n, limit=self.dayLimit)
         
+        print(time.time()-start_time)
     def plotDaysAverage(self, days_chosen: list[int], intersections:list[Intersection]=None):
         
         fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
@@ -47,23 +49,7 @@ class StockHelper:
         plt.show()
         
     def getNDaysAverage(self, n: int, limit: int) -> pd.Series:
-        closing_price = self.data["Close"][-(limit+n):][::-1]
-        
-        temp_sum = closing_price.head(n).sum()
-        output_series = pd.Series(dtype=float)
-        index = 0
-        
-        for dt_index, price in closing_price.items():
-            if index == limit:
-                break
-            if index == 0:
-                output_series.at[dt_index] = temp_sum / n
-            else:
-                temp_sum += closing_price.iloc[index+n-1] - closing_price.iloc[index-1]
-                output_series.at[dt_index] = temp_sum / n
-            index += 1
-        
-        return output_series[::-1]
+        return self.data[-(limit+n):]["Close"].rolling(window=n).mean()
     
     def getLineIntersections(self, target_n: int, remaining_n: list[int], prev_days:int=None) -> list[Intersection]:
         

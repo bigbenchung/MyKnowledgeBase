@@ -1,5 +1,6 @@
 import yfinance as yf
 from sys import argv
+import warnings
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,6 +12,8 @@ from Intersection import Intersection
 class StockHelper:
     
     def __init__(self, stock_code: str, period: str):
+        warnings.filterwarnings('ignore')
+        
         self.stock_code = stock_code
         self.period = period
         
@@ -21,15 +24,13 @@ class StockHelper:
         
         self.data = self.data[self.data.columns.drop(["Dividends", "Stock Splits"])]
         self.data = self.data.set_index(self.data.index.date)
-        
+        self.data.index.name = "Date"
         self.DaysAvg = dict()
         self.dayLimit = len(self.data)-20
-        import time
-        start_time = time.time()
+        
         for n in (3, 5, 7, 10, 20):
             self.DaysAvg[n] = self.getNDaysAverage(n, limit=self.dayLimit)
-        
-        print(time.time()-start_time)
+
     def plotDaysAverage(self, days_chosen: list[int], intersections:list[Intersection]=None):
         
         fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
@@ -41,6 +42,21 @@ class StockHelper:
             for intersection in intersections:
                 color = "r" if intersection.up_trend else "b"
                 ax1.axvline(x=intersection.day, color=color, linestyle='--')
+        
+        # plot candle sticks
+        data = self.data.iloc[-self.dayLimit:]
+         
+        ax1.vlines(x=data.index, ymin=data["Low"], ymax=data["High"], color="grey")
+        
+        red_bars = data[data.Close >= data.Open]
+        red_bars["Height"] = red_bars["Close"] - red_bars["Open"]
+        
+        black_bars = data[data.Close < data.Open]
+        black_bars["Height"] = black_bars["Open"] - black_bars["Close"]
+        
+        ax1.bar(x=red_bars.index, height=red_bars["Height"], bottom=red_bars["Open"], color="red")
+        ax1.bar(x=black_bars.index, height=black_bars["Height"], bottom=black_bars["Close"], color="black")
+        
         ax1.legend()
         
         ax2.plot(self.data["Close"].iloc[-self.dayLimit:])

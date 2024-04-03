@@ -3,10 +3,11 @@ from datetime import datetime
 
 from StockHelper import StockHelper
 from GoldenCrossTrading import GoldenCrossTrading
+from Intersection import Intersection
 
 def findBuyStocks():
     all_large_tickers = pd.read_csv("./data/largestTickers.csv")
-    candidates_stocks = list()
+    candidates_stocks: list[tuple[StockHelper, list[Intersection]]] = list()
 
     for i, row in all_large_tickers.iterrows():
         ticker = row["Symbol"]
@@ -23,8 +24,6 @@ def findBuyStocks():
             if (datetime.now().date() - last_signal["date"]).days < 3:
                 if last_signal["buy/sell"] == "buy":
                     candidates_stocks.append((stock, intersections))
-                else:
-                    pass
         
     candidates = ""
 

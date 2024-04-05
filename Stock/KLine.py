@@ -1,3 +1,9 @@
+from sys import argv
+import numpy as np
+import matplotlib.pyplot as plt
+
+from StockHelper import StockHelper
+
 class KLine:
     
     """
@@ -13,6 +19,7 @@ class KLine:
     8: cross -- usually occur during transition period
     9: grave tower -- may mean being short selled, may drop later
     """
+    length_threshold = 0.025
     
     def __init__(self, open, high, low, close) -> None:
         self.open = open
@@ -28,4 +35,30 @@ class KLine:
         return True if self.getRelativeLength(p1, p2) < 0.05 else False
     
     def determineCategory(self):
-        pass
+        if self.approxEqual(self.open, self.close):
+            if self.approxEqual(self.open, self.low) and self.high :
+                
+
+if __name__ == "__main__":
+    try:
+        code = argv[1]
+    except IndexError:
+        code = "TSLA"
+    
+    try:
+        period = argv[2]
+    except IndexError:
+        period = "60mo"
+        
+    stock = StockHelper(code, period=period)
+    
+    relativeLengths = np.array([0.0]*len(stock.data))
+    counter = 0
+    
+    for i, row in stock.data.iterrows():
+        line = KLine(row["Open"], row["High"], row["Low"], row["Close"])
+        relativeLengths[counter] = line.total_length / line.high
+        counter += 1
+    
+    plt.hist(relativeLengths, bins=20)
+    plt.show()

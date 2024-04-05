@@ -60,7 +60,7 @@ class GoldenCrossTrading(TradingStrategy):
             export_df = pd.DataFrame(columns=["buy_lag1_return", "buy_20day_slope", "gain/loss"])
             index_tracker = 0
             
-        intersections: list[Intersection] = self.stock.getLineIntersections(target_n=20, remaining_n=[3,5,7])
+        intersections: list[Intersection] = self.stock.getLineIntersections(target_n=self.target_n, remaining_n=self.remaining_n)
         
         signals = self.getBuySellSignals(intersections)
         

@@ -7,23 +7,23 @@ class Solution:
     def minRemoveToMakeValid(self, s: str) -> str:
         
         i = len(s) - 1
-        removal_tracker = list()
-        close_tracker = list()
+        removal_tracker = set()
+        close_tracker = set()
 
         while i >= 0:
             char = s[i]
 
             if char == ")":
-                close_tracker.append(i)
+                close_tracker.add(i)
             elif char == "(":
                 if close_tracker:
                     close_tracker.pop()
                 else:
-                    removal_tracker.append(i)
+                    removal_tracker.add(i)
             i -= 1
         
-        removal_tracker = sorted(removal_tracker + close_tracker, reverse=True)
-
+        removal_tracker = sorted(set.union(removal_tracker,close_tracker), reverse=True)
+        
         for idx in removal_tracker:
             s = s[:idx] + s[idx+1:]
 

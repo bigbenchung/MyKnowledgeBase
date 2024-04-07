@@ -5,8 +5,6 @@ class Solution:
     totalTimer = Timer()
 
     def checkValidString(self, s: str) -> bool:
-        if s[0] == ")" or s[-1] == "(":
-            return False
         
         forward_counter = 0
         backward_counter = 0

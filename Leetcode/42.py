@@ -1,6 +1,6 @@
 import numpy as np
 
-from Timer import Timer
+from CodeTimer import Timer
 
 class Solution:
     

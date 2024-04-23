@@ -1,6 +1,6 @@
 from collections import Counter
 
-from Timer import Timer
+from CodeTimer import Timer
 
 class Solution:
     

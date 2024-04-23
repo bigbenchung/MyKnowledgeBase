@@ -1,4 +1,4 @@
-from Timer import Timer
+from CodeTimer import Timer
 from queue import PriorityQueue
 
 class Solution:

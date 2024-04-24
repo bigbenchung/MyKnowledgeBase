@@ -3,7 +3,7 @@ from datetime import datetime
 
 import numpy as np
 import pandas as pd
-import pickle
+from pickle import dumps, loads
 
 from StockHelper import StockHelper
 from TradingStrategy import TradingStrategy
@@ -15,13 +15,14 @@ class GoldenCrossTrading(TradingStrategy):
         super().__init__(stock, principal)
         self.target_n = target_n
         self.remaining_n = remaining_n
-        self.default = dict()
+        default = dict()
         
         for n in remaining_n:
-            self.default[n] = False
-    
+            default[n] = False
+        self.default = dumps(default)
+        
     def resetCheck(self) -> dict:
-        return self.default
+        return loads(self.default)
     
     def getBuySellSignals(self, intersections: list[Intersection]) -> list[dict]:
         # containing dict with keys date, buy/sell, trade_price, intersection
@@ -33,25 +34,29 @@ class GoldenCrossTrading(TradingStrategy):
             if up_trend == None:
                 up_trend = intersection.up_trend
             
+            if intersection.up_trend != up_trend:
+                up_trend = not up_trend
+                check = self.resetCheck()
+                
             if intersection.up_trend == up_trend:
                 check[intersection.n_avg] = True
                 if set(check.values()) == {True}:
                     trade_price = self.stock.getPriceByDate(intersection.day, "Open")
-                    if up_trend and not self.bought:
+                    if up_trend and (not signals or signals[-1]["buy/sell"] == "sell"):
                         signals.append({"date": intersection.day, 
                                         "buy/sell": "buy", 
                                         "trade_price": trade_price,
                                         "intersection": intersection})
                         check = self.resetCheck()
-                    elif not up_trend and self.bought:
-                        signals.append({"date": intersection.day, 
-                                        "buy/sell": "sell", 
-                                        "trade_price": trade_price,
-                                        "intersection": intersection})
-                        check = self.resetCheck()
-            else:
-                up_trend = not up_trend
-                check = self.resetCheck()
+                    elif not up_trend and signals:
+                        if signals[-1]["buy/sell"] == "buy":
+                            print("sell")
+                            signals.append({"date": intersection.day, 
+                                            "buy/sell": "sell", 
+                                            "trade_price": trade_price,
+                                            "intersection": intersection})
+                            check = self.resetCheck()
+
         return signals
 
     def trade(self, export=False):
@@ -111,3 +116,6 @@ if __name__ == "__main__":
     )
     trading.trade()
     trading.printDetails()
+    
+    for i in StockHelper(stock_code=code, period=period).getLineIntersections(20, [3,5,7]):
+        print(i.day, i.up_trend, i.n_avg)

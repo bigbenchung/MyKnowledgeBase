@@ -50,7 +50,6 @@ class GoldenCrossTrading(TradingStrategy):
                         check = self.resetCheck()
                     elif not up_trend and signals:
                         if signals[-1]["buy/sell"] == "buy":
-                            print("sell")
                             signals.append({"date": intersection.day, 
                                             "buy/sell": "sell", 
                                             "trade_price": trade_price,

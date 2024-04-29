@@ -7,23 +7,31 @@ class Solution:
     totalTimer = Timer()
         
     def sumOfDistancesInTree(self, n: int, edges: list[list[int]]) -> list[int]:
-        tracker = np.zeros((n, n))
-        max_seen_idx = 0
+        graph = defaultdict(list)
+        for u, v in edges:
+            graph[u].append(v)
+            graph[v].append(u)
 
-        for _from, _to in edges:
-            (_from, _to) = (_to, _from) if _from > _to else (_from, _to)
+        count = [1] * n
+        res = [0] * n
 
-            max_seen_idx = max(max_seen_idx, _to)
+        def dfs(node, parent):
+            for child in graph[node]:
+                if child != parent:
+                    dfs(child, node)
+                    count[node] += count[child]
+                    res[node] += res[child] + count[child]
 
-            for i in range(max_seen_idx+1):
-                if i not in (_from, _to):
-                    increment = 1 + np.count_nonzero(tracker[_from])
-                    tracker[i][_to] += increment
-                    tracker[_to][i] += increment
-            tracker[_to][_from] = 1
-            tracker[_from][_to] = 1
-            print(tracker)
+        def dfs2(node, parent):
+            for child in graph[node]:
+                if child != parent:
+                    res[child] = res[node] - count[child] + (n - count[child])
+                    dfs2(child, node)
+
+        dfs(0, -1)
+        dfs2(0, -1)
         
+        return res
             
 if __name__ == "__main__":
     solution = Solution()

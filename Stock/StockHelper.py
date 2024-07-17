@@ -157,7 +157,7 @@ if __name__ == "__main__":
     try:
         period = argv[2]
     except IndexError:
-        period = "12mo"
+        period = "6mo"
         
     stock = StockHelper(code, period=period)
     

@@ -12,7 +12,12 @@ def findBuyStocks():
     for i, row in all_large_tickers.iterrows():
         ticker = row["Symbol"]
         print(f"Checking {ticker}...")
-        stock = StockHelper(stock_code=ticker, period="3mo")
+        
+        try:
+            stock = StockHelper(stock_code=ticker, period="3mo")
+        except KeyError:
+            print(f"{ticker} cannot be found... skipping to next")
+            continue
 
         intersections = stock.getLineIntersections(20, [3,5,7])
         trade = GoldenCrossTrading(stock, 10000, 20, [3,5,7])

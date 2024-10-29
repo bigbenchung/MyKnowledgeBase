@@ -3,7 +3,7 @@ import asyncio
 import json
 from sys import argv
 
-async def chat(name: str, bot: str, message: str):
+async def chat(name: str, bot: str, message: str, write_to_file=True):
     tokens = json.load(open(r".\Homework\MSBD5018\group_project\resources\tokens.json", "r"))
     client = await AsyncPoeApi(tokens=tokens).create()
     full_response = []
@@ -15,8 +15,11 @@ async def chat(name: str, bot: str, message: str):
     # Write only once after collecting all chunks
     if full_response:  # Check if we have any response
         complete_response = ''.join(full_response).replace(',', '.').replace('\n', '')
-        with open(r".\Homework\MSBD5018\group_project\responses\experiment.csv", "a", encoding="utf-8") as file:
-            file.write(f"{name},{complete_response}\n")
+        if write_to_file:
+            with open(r".\Homework\MSBD5018\group_project\responses\experiment.csv", "a", encoding="utf-8") as file:
+                file.write(f"{name},{complete_response}\n")
+        else:
+            print(complete_response)
 
 if __name__ == "__main__":
-    asyncio.run(chat(name="", bot="gpt3_5", message="hello"))
+    asyncio.run(chat(name="", bot="claude_3_sonnet_200k", message="hello", write_to_file=False))

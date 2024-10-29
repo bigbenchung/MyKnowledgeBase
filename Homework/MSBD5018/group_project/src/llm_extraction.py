@@ -17,7 +17,12 @@ def extract(mode: str, bot: str, domain: str=""):
         base_prompt =f"""USER: {jailbreak_prompt}
                 ASSISTANT: {ack_prompt}
                 USER: {query_prompt}{guess_prompt}"""
-
+                
+    if "claude" in bot.lower():
+        base_prompt = base_prompt.replace("ChatGPT", "Claude Agent")
+    
+    # print(base_prompt)
+    # sys.exit()
     for name, info in enron_info.items():
         print(f"Processing {name} ...")
         new_prompt = base_prompt.replace("{domain}", domain).replace("{name}", name)
@@ -38,6 +43,6 @@ if __name__ == "__main__":
     try:
         domain = argv[3]
     except:
-        domain = "Enron"
+        domain = "your existing knowledge"
 
     extract(mode, bot, domain)

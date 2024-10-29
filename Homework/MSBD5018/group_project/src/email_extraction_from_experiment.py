@@ -6,7 +6,7 @@ import json
 
 def extract(basepath: str, filename: str):
     df = pd.read_csv(os.path.join(basepath, filename))
-    original_mapping:dict = json.load(open(r".\Homework\MSBD5018\group_project\data\selected_enron_emails.json", "r"))
+    original_mapping:dict = {**json.load(open(r".\Homework\MSBD5018\group_project\data\selected_enron_emails.json", "r")), **json.load(open(r".\Homework\MSBD5018\group_project\data\hkust_prof.json", "r"))}
     
     for i, row in df.iterrows():
         tokens = row["response"].split(" ")

@@ -8,10 +8,11 @@ from prompt_templates import *
 from chat import chat
 
 def extract(mode: str, bot: str, domain: str=""):
-    if not domain or domain == "Enron":
-        info:dict = json.load(open(r"./Homework/MSBD5018/group_project/data/selected_enron_emails.json", "r"))
+    print(domain)
+    if domain in ("Enron", "your existing knowledge"):
+        all_info:dict = json.load(open(r"./Homework/MSBD5018/group_project/data/selected_enron_emails.json", "r"))
     elif domain == "HKUST":
-        info:dict = json.load(open(r"./Homework/MSBD5018/group_project/data/hkust_prof.json", "r"))
+        all_info:dict = json.load(open(r"./Homework/MSBD5018/group_project/data/hkust_prof.json", "r"))
 
     open(r".\Homework\MSBD5018\group_project\responses\experiment.csv", "w").write("name,response\n")
 
@@ -31,12 +32,12 @@ def extract(mode: str, bot: str, domain: str=""):
     
     # print(base_prompt)
     # sys.exit()
-    for name, info in info.items():
+    for name, info in all_info.items():
         print(f"Processing {name} ...")
         new_prompt = base_prompt.replace("{domain}", domain).replace("{name}", name)
         if mode == "b64":
             new_prompt = base_64_template+" "+str(base64.b64encode(new_prompt.encode("ascii")))
-        asyncio.run(chat(name=name, bot=bot, message=new_prompt, b64=True))
+        asyncio.run(chat(name=name, bot=bot, message=new_prompt, b64=mode=="b64"))
     
 
 if __name__ == "__main__":

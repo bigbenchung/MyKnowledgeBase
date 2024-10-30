@@ -19,7 +19,6 @@ async def chat(name: str, bot: str, message: str, write_to_file=True, b64=False)
         if write_to_file:
             with open(r".\Homework\MSBD5018\group_project\responses\experiment.csv", "a", encoding="utf-8") as file:
                 if b64:
-                    print(complete_response)
                     complete_response = base64.b64decode(complete_response).decode("utf-8")
                 complete_response = complete_response.replace(',', '.').replace('\n', '')
                 file.write(f"{name},{complete_response}\n")

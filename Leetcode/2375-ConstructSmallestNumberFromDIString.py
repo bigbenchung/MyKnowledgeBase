@@ -21,16 +21,17 @@ class Solution:
         self.required_digits = len(pattern)+1
 
         def dfs(last_num: str, pt: str, required_len:int, used:set[str]) -> str:
-            avail = self.numbers.difference(used)
             if not pt:
                 for n in self.numbers_lst:
-                    if n in avail:
+                    if n not in used:
                         return last_num + n
                     return last_num
-                
+            
             _type, pt = pt[0], pt[1:]
-            avail_lst = [n for n in self.numbers_lst if n in avail and int(n) > int(last_num)] if _type == "I" \
-                else [n for n in self.numbers_lst if n in avail and int(n) < int(last_num)]
+            
+            avail_lst = [n for n in self.numbers_lst if n not in used and int(n) > int(last_num)] if _type == "I" \
+                else [n for n in self.numbers_lst if n not in used and int(n) < int(last_num)]
+            
             if avail_lst:
                 if not _type:
                     return avail_lst[0]

@@ -18,10 +18,14 @@ def findBuyStocks():
         except KeyError:
             print(f"{ticker} cannot be found... skipping to next")
             continue
-
-        intersections = stock.getLineIntersections(20, [3,5,7])
-        trade = GoldenCrossTrading(stock, 10000, 20, [3,5,7])
-        signals: list[dict] = trade.getBuySellSignals(intersections)
+        
+        try:
+            intersections = stock.getLineIntersections(20, [3,5,7])
+            trade = GoldenCrossTrading(stock, 10000, 20, [3,5,7])
+            signals: list[dict] = trade.getBuySellSignals(intersections)
+        except:
+            print(f"Failed to find intersections for {ticker}")
+            continue
         
 
         if signals:
